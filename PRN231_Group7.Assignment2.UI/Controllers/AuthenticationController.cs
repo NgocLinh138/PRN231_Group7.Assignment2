@@ -37,8 +37,8 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
                 {
                     Method = HttpMethod.Get,
                     RequestUri = new Uri(url),
-
                 };
+
                 httpRequestMessage.Headers.Add("Accept", "application/json");
 
                 var httpResponseMessage = await client.SendAsync(httpRequestMessage);
