@@ -4,8 +4,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>@ViewData["Title"] - Book Management</title>
-
+    <title>@ViewData["Title"] - Book Store</title >
 </head>
 
 <body>
@@ -23,10 +22,12 @@
         </form>
 
 
-
-        <div class="d-flex justify-content-start mt-5 mb-3">
-            <a class="btn btn-secondary" asp-controller="Books" asp-action="Create">Add Book</a>
-        </div>
+        @* @if (TempData["UserRole"] != null && TempData["UserRole"].ToString() == "Admin") *@
+        @* { *@
+            <div class="d-flex justify-content-start mt-5 mb-3">
+                <a class="btn btn-secondary" asp-controller="Books" asp-action="Create">Add Book</a>
+            </div>
+        @* } *@
 
 
         <table class="table table-hover table-bordered">
@@ -42,8 +43,12 @@
                     <th>Published Date</th>
                     <th>Publisher</th>
                     <th>Notes</th>
-                    <th></th>
-                    <th></th>
+
+                    @* @if (TempData["UserRole"] != null && TempData["UserRole"].ToString() == "Admin") *@
+                    @* { *@
+                        <th></th>
+                        <th></th>
+                    @* } *@
                 </tr>
             </thead>
             <tbody>
@@ -69,13 +74,17 @@
                         <td class="truncated-id" onclick="toggleIdDisplay(this)">@book.PublishedDate.ToString("dd-MM-yyyy HH:mm:ss")</td>
                         <td class="truncated-id" onclick="toggleIdDisplay(this)">@book.Publisher.PublisherName</td>
                         <td class="truncated-id" style="max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" onclick="toggleIdDisplay(this)">@book.Notes</td>
-                        <td>
-                            <a asp-controller="Books" asp-action="Update" asp-route-id="@book.Id"
-                               class="btn btn-secondary">Update</a>
-                        </td>
-                        <td>
-                            <button type="button" class="btn btn-danger" onclick="openDeleteModal('@book.Id')">Delete</button>
-                        </td>
+                       
+                        @* @if (TempData["UserRole"] != null && TempData["UserRole"].ToString() == "Admin") *@
+                        @* { *@
+                            <td>
+                                <a asp-controller="Books" asp-action="Update" asp-route-id="@book.Id"
+                                   class="btn btn-secondary">Update</a>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-danger" onclick="openDeleteModal('@book.Id')">Delete</button>
+                            </td>
+                        @* } *@
                     </tr>
                 }
             </tbody>

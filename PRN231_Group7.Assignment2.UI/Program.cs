@@ -6,6 +6,7 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddHttpClient();
 
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

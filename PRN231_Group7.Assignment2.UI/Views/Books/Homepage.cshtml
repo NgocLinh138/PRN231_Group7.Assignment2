@@ -1,0 +1,25 @@
+﻿﻿@{
+    ViewData["Title"] = "Homepage";
+}
+
+
+<section class="text-center">
+    <div class="container">
+        <h1>Welcome to Bookstore</h1>
+        
+        <form method="get" action="@Url.Action("Index", "Books")" class="my-5 book-search-form">
+            <label for="searchValue">Search by title:</label>
+            <div class="row mt-2">
+                <div class="form-group col-md-6">
+                    <input type="text" class="form-control" id="searchValue" name="searchValue" placeholder="Enter title..." value="@ViewBag.SearchValue">
+                </div>
+                <div class="form-group col-md-6 p-0">
+                    <input type="submit" class="btn btn-secondary" value="Search" />
+                </div>
+            </div>
+        </form>
+
+
+
+    </div>
+</section>
