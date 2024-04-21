@@ -120,6 +120,11 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
         [HttpPost]
         public async Task<IActionResult> Update(UpdateBookRequestModel request)
         {
+            if(!ModelState.IsValid)
+            {
+                return View(request);
+            }
+
             var client = httpClientFactory.CreateClient();
             var url = $"http://localhost:5010/api/books/{request.Id}";
 
@@ -152,8 +157,8 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
                 var client = httpClientFactory.CreateClient();
                 var url = $"http://localhost:5010/api/books/{book.Id}";
 
-                var httpResponseMsg = await client.DeleteAsync(url);
-                httpResponseMsg.EnsureSuccessStatusCode();
+                var httpResponseMessage = await client.DeleteAsync(url);
+                httpResponseMessage.EnsureSuccessStatusCode();
                 return RedirectToAction("Index", "Books");
             }
             catch (Exception ex)
