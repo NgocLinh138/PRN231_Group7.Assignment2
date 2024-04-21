@@ -1,0 +1,103 @@
+﻿@model IEnumerable<PRN231_Group7.Assignment2.UI.Models.Book.BookModel>
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@ViewData["Title"] - Book Management</title>
+</head>
+
+<body>
+    <div class="container mt-5">
+        <form method="get" action="@Url.Action("Index", "Books")" class="my-5 book-search-form">
+            <label for="searchValue">Search by title:</label>
+            <div class="row mt-2">
+                <div class="form-group col-md-6">
+                    <input type="text" class="form-control" id="searchValue" name="searchValue" placeholder="Enter title..." value="@ViewBag.SearchValue">
+                </div>
+                <div class="form-group col-md-6 p-0">
+                    <input type="submit" class="btn btn-secondary" value="Search" />
+                </div>
+            </div>
+        </form>
+
+
+
+        <div class="d-flex justify-content-start mt-5 mb-3">
+            <a class="btn btn-secondary" asp-controller="Books" asp-action="Create">Add Book</a>
+        </div>
+
+
+        <table class="table table-hover table-bordered">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>Price</th>
+                    <th>Advance</th>
+                    <th>Royalty</th>
+                    <th>YTD Sales</th>
+                    <th>Published Date</th>
+                    <th>Publisher</th>
+                    <th>Notes</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var book in Model)
+                {
+                    <tr>
+                        <td class="truncated-id" style="max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" onclick="toggleIdDisplay(this)">@book.Id</td>
+                        <td class="truncated-id" onclick="toggleIdDisplay(this)">@book.Title</td>
+                        <td class="truncated-id" onclick="toggleIdDisplay(this)">@book.Type</td>
+                        <td class="truncated-id" onclick="toggleIdDisplay(this)">$@book.Price</td>
+                        @if (book.Advance.HasValue) {
+                            <td class="truncated-id" onclick="toggleIdDisplay(this)">
+                                $@book.Advance
+                            </td>
+                        } 
+                        else
+                        {
+                            <td class="truncated-id" onclick="toggleIdDisplay(this)">
+                            </td>
+                        }
+                        <td class="truncated-id" onclick="toggleIdDisplay(this)">@book.Royalty</td>
+                        <td class="truncated-id" onclick="toggleIdDisplay(this)">@book.YtdSales</td>
+                        <td class="truncated-id" onclick="toggleIdDisplay(this)">@book.PublishedDate.ToString("dd-MM-yyyy HH:mm:ss")</td>
+                        <td class="truncated-id" onclick="toggleIdDisplay(this)">@book.Publisher.PublisherName</td>
+                        <td class="truncated-id" onclick="toggleIdDisplay(this)">@book.Notes</td>
+                        <td>
+                            <a asp-controller="Books" asp-action="Update" asp-route-id="@book.Id"
+                               class="btn btn-secondary">Update</a>
+                        </td>
+                        <td>
+                            <form method="post">
+                                <input type="hidden" class="form-control" asp-for="@book.Id" />
+                                <button type="submit" asp-controller="Books" asp-action="Delete" class="btn btn-danger">
+                                    Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+
+    <script>
+        function toggleIdDisplay(cell) {
+            if (cell.classList.contains('truncated')) {
+                cell.classList.remove('truncated');
+                cell.style.maxWidth = '';
+            } else {
+                cell.classList.add('truncated');
+                cell.style.maxWidth = '100px';
+            }
+        }
+    </script>
+</body>
+</html>
+
