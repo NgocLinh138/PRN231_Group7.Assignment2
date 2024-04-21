@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PRN231_Group7.Assignment2.UI.Models.Authentication;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using PublisherResponse = PRN231_Group7.Assignment2.Contract.Service.Publisher.Response;
@@ -49,7 +51,17 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
                     var token = JsonSerializer.Deserialize<string>(response);
                     httpContextAccessor.HttpContext.Response.Cookies.Append("JwtToken", token);
 
-                    return RedirectToAction("Index", "Books");
+                    var userRole = GetRoleFromToken(token);
+                    httpContextAccessor.HttpContext.Session.SetString("UserRole", userRole);
+
+                    if (userRole == "Admin")
+                    {
+                        return RedirectToAction("Index", "Books");
+                    }
+                    else
+                    {
+                        return RedirectToAction("Index", "Home");
+                    }
                 }
 
                 TempData["ErrorMessage"] = "Invalid email or password.";
@@ -62,6 +74,18 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
                 return View();
             }
         }
+
+
+        private string GetRoleFromToken(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var jwtToken = tokenHandler.ReadJwtToken(token);
+            var claims = jwtToken.Claims;
+            var roleClaim = claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+            return roleClaim?.Value;
+        }
+
+
 
         private async Task<List<PublisherResponse>> GetPublishers()
         {
