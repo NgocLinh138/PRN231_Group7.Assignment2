@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace PRN231_Group7.Assignment2.UI.Models
+namespace PRN231_Group7.Assignment2.UI.Models.Authentication
 {
     public class LoginModel
     {
