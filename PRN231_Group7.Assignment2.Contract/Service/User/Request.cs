@@ -44,8 +44,8 @@ namespace PRN231_Group7.Assignment2.Contract.Service.User
           string Password,
           string? Source,
           DateTime HireDate
-          //Guid PubId,
-          //Guid RoleId
+        //Guid PubId,
+        //Guid RoleId
         );
 
         public record RegisterUser(
@@ -62,11 +62,10 @@ namespace PRN231_Group7.Assignment2.Contract.Service.User
           [Required(ErrorMessage = "{0} is required")]
           [Phone(ErrorMessage = "{0} should contain 10 digits.")]
           string Phone,
-
+          string? Source,
           string Password,
           DateTime HireDate,
-          Guid PublisherId,
-          Guid RoleId
+          Guid PublisherId
         );
 
         public record Login(

@@ -30,7 +30,7 @@ namespace PRN231_Group7.Assignment2.API.Controllers
             var existUser = unitOfWork.UserRepository.FindByEmailAsync(request.EmailAddress);
             if (existUser == null)
                 return BadRequest("Email already register!");
-
+            var role = unitOfWork.RoleRepository.GetCustomerRole();
             var user = new User
             {
                 EmailAddress = request.EmailAddress,
@@ -40,7 +40,8 @@ namespace PRN231_Group7.Assignment2.API.Controllers
                 Password = request.Password,
                 HireDate = request.HireDate,
                 PubId = request.PublisherId,
-                RoleId = request.RoleId
+                Source = request.Source,
+                RoleId = role.Id
             };
 
             unitOfWork.UserRepository.Insert(user);
@@ -66,7 +67,7 @@ namespace PRN231_Group7.Assignment2.API.Controllers
 
                 // GetToken
                 var token = jWTTokenService.GenerateAccessToken(claims);
-                return Ok(new { Token = token });
+                return Ok(token);
             }
 
             return BadRequest("Invalid email or password.");

@@ -1,17 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PRN231_Group7.Assignment2.UI.Models;
+using PRN231_Group7.Assignment2.UI.Models.Authentication;
 using System.Text;
 using System.Text.Json;
+using PublisherResponse = PRN231_Group7.Assignment2.Contract.Service.Publisher.Response;
 
 namespace PRN231_Group7.Assignment2.UI.Controllers
 {
     public class AuthenticationController : Controller
     {
         private readonly IHttpClientFactory httpClientFactory;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
-        public AuthenticationController(IHttpClientFactory httpClientFactory)
+        public AuthenticationController(
+            IHttpClientFactory httpClientFactory,
+            IHttpContextAccessor httpContextAccessor)
         {
             this.httpClientFactory = httpClientFactory;
+            this.httpContextAccessor = httpContextAccessor;
         }
 
         [HttpGet]
@@ -26,13 +31,77 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
             try
             {
                 var client = httpClientFactory.CreateClient();
-                var url = "http://localhost:5010/api/auth/Login";
+                var url = $"http://localhost:5010/api/auth/Login?EmailAddress={email}&Password={password}";
 
-                var request = new LoginModel
+                var httpRequestMessage = new HttpRequestMessage()
                 {
-                    EmailAddress = email,
-                    Password = password,
+                    Method = HttpMethod.Get,
+                    RequestUri = new Uri(url),
+
                 };
+                httpRequestMessage.Headers.Add("Accept", "application/json");
+
+                var httpResponseMessage = await client.SendAsync(httpRequestMessage);
+
+                if (httpResponseMessage.IsSuccessStatusCode)
+                {
+                    var response = await httpResponseMessage.Content.ReadAsStringAsync();
+                    var token = JsonSerializer.Deserialize<string>(response);
+                    httpContextAccessor.HttpContext.Response.Cookies.Append("JwtToken", token);
+
+                    return RedirectToAction("Index", "Books");
+                }
+
+                TempData["ErrorMessage"] = "Invalid email or password.";
+                return View();
+
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "An error occurred while processing your request.";
+                return View();
+            }
+        }
+
+        private async Task<List<PublisherResponse>> GetPublishers()
+        {
+            try
+            {
+                var client = httpClientFactory.CreateClient();
+                var response = await client.GetAsync("http://localhost:5010/api/publishers");
+                response.EnsureSuccessStatusCode();
+                var content = await response.Content.ReadAsStringAsync();
+                var publishers = JsonSerializer.Deserialize<List<PublisherResponse>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                return publishers ?? new List<PublisherResponse>();
+            }
+            catch (Exception ex)
+            {
+                return new List<PublisherResponse>();
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Register()
+        {
+            var publishers = await GetPublishers();
+            ViewBag.Publishers = publishers ?? new List<PublisherResponse>();
+            return View(new RegisterModel());
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Register(RegisterModel request)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    var publishers = await GetPublishers();
+                    ViewBag.Publishers = publishers ?? new List<PublisherResponse>();
+                    return View(request);
+                }
+
+                var client = httpClientFactory.CreateClient();
+                var url = "http://localhost:5010/api/auth/register";
 
                 var httpRequestMessage = new HttpRequestMessage()
                 {
@@ -43,32 +112,19 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
 
                 var httpResponseMessage = await client.SendAsync(httpRequestMessage);
 
-                if(httpResponseMessage.IsSuccessStatusCode)
+                if (httpResponseMessage.IsSuccessStatusCode)
                 {
-                    var response = await httpResponseMessage.Content.ReadAsStringAsync();
-                    var tokenObj = JsonSerializer.Deserialize<dynamic>(response);
-                    var token = tokenObj.Token;
-                    var role = tokenObj.Role;
-
-                    if (role == "Admin")
-                    {
-                        return RedirectToAction("Index", "Books");
-                    }
-                    else
-                    {
-                        return RedirectToAction("Index", "Home");
-                    }
+                    return RedirectToAction("Login", "Authentication");
                 }
                 else
                 {
-                    TempData["ErrorMessage"] = "Invalid email or password.";
-                    return RedirectToAction("Index");
+                    var responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
+                    return BadRequest("Error: " + responseContent);
                 }
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = "An error occurred while processing your request.";
-                return RedirectToAction("Index");
+                return BadRequest("Error: " + ex.Message);
             }
         }
     }
