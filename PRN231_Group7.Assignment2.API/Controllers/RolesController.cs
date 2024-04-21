@@ -13,7 +13,7 @@ namespace PRN231_Group7.Assignment2.API.Controllers
 {
     [Route("api/roles")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class RolesController : ControllerBase
     {
         private readonly IUnitOfWork unitOfWork;

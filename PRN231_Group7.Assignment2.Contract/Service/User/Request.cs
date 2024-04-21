@@ -19,7 +19,10 @@ namespace PRN231_Group7.Assignment2.Contract.Service.User
           [Phone(ErrorMessage = "{0} should contain 10 digits.")]
           string Phone,
 
+          [Required(ErrorMessage = "{0} is required")]
           string Password,
+
+          [Required(ErrorMessage = "{0} is required")]
           DateTime HireDate,
           Guid PubId,
           Guid RoleId

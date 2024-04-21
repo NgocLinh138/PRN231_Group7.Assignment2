@@ -11,7 +11,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-3 p-0">
-                @await Html.PartialAsync("_Header")
+                @await Html.PartialAsync("_Sidebar")
             </div>
             <div class="col-md-9 p-0">
                 @RenderBody()
@@ -20,8 +20,8 @@
     </div>
 
 
-    <partial name="_footer" />
-
+@*     <partial name="_footer" />
+ *@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

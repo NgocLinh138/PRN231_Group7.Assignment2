@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using UpdateUser = PRN231_Group7.Assignment2.UI.Models.User.UserRequestModel.UpdateUser;
+using CreateUser = PRN231_Group7.Assignment2.UI.Models.User.UserRequestModel.CreateUser;
 using System.Text;
 using System.Text.Json;
 using PRN231_Group7.Assignment2.UI.Models.User;
 using RoleResponse = PRN231_Group7.Assignment2.Contract.Service.Role.Response;
+using PublisherResponse = PRN231_Group7.Assignment2.Contract.Service.Publisher.Response;
+using PRN231_Group7.Assignment2.Repo.Model;
 
 namespace PRN231_Group7.Assignment2.UI.Controllers
 {
@@ -51,18 +54,23 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
             {
                 var roles = await GetRoles();
                 ViewBag.Roles = roles ?? new List<RoleResponse>();
-                return View(new UserRequestModel());
+
+                var publishers = await GetPublishers();
+                ViewBag.Publishers = publishers ?? new List<PublisherResponse>();
+
+                return View();
             }
             catch (Exception ex)
             {
                 ViewBag.Roles = new List<RoleResponse>();
-                return View(new UserRequestModel());
+                ViewBag.Publishers = new List<PublisherResponse>();
+                return View();
             }
         }
 
 
         [HttpPost]
-        public async Task<IActionResult> Create(UpdateUser request)
+        public async Task<IActionResult> Create(CreateUser request)
         {
             try
             {
@@ -121,6 +129,11 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
         {
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    return View(request);
+                }
+
                 var client = httpClientFactory.CreateClient();
                 var url = $"http://localhost:5010/api/users/{request.Id}";
 
@@ -149,6 +162,40 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
         }
 
 
+        public async Task<IActionResult> Delete(UserModel user)
+        {
+            try
+            {
+                var client = httpClientFactory.CreateClient();
+                var url = $"http://localhost:5010/api/users/{user.Id}";
+
+                var httpResponseMessage = await client.DeleteAsync(url);
+                httpResponseMessage.EnsureSuccessStatusCode();
+                return RedirectToAction("Index", "Users");
+            }
+            catch (Exception ex)
+            {
+            }
+            return View("Index");
+        }
+
+
+        private async Task<List<PublisherResponse>> GetPublishers()
+        {
+            try
+            {
+                var client = httpClientFactory.CreateClient();
+                var response = await client.GetAsync("http://localhost:5010/api/publishers");
+                response.EnsureSuccessStatusCode();
+                var content = await response.Content.ReadAsStringAsync();
+                var publishers = JsonSerializer.Deserialize<List<PublisherResponse>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                return publishers ?? new List<PublisherResponse>();
+            }
+            catch (Exception ex)
+            {
+                return new List<PublisherResponse>();
+            }
+        }
 
         private async Task<List<RoleResponse>> GetRoles()
         {
