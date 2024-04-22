@@ -20,8 +20,11 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
 
         [HttpGet]
         public async Task<IActionResult> Index(
+            string? searchBy,
             string? searchValue,
-            string? publisher,
+            double? minPrice,
+            double? maxPrice,
+            string? orderBy,
             int pageIndex = 1)
         {
             var roleName = httpContextAccessor.HttpContext.Session.GetString("UserRole");
@@ -33,13 +36,29 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
                 var client = httpClientFactory.CreateClient();
                 var url = $"http://localhost:5010/api/books?orderByAsc=true&pageIndex={pageIndex}&pageSize={this.pageSize}";
 
-                if (!string.IsNullOrEmpty(searchValue))
+                if(!string.IsNullOrEmpty(searchBy))
+                {
+                    if(searchBy == "Title")
+                    {
+                        url += $"&searchByTitle={searchValue}";
+                    }
+                    else if (searchBy == "Publisher")
+                    {
+                        url += $"&searchByPublisher={searchValue}";
+                    }
+                }
 
-                    url += $"&searchValue={searchValue}";
 
-                if (!string.IsNullOrEmpty(publisher))
+                if (minPrice != null)
+                {
+                    url += $"&minPrice={minPrice}";
+                }
+                if (maxPrice != null)
+                {
+                    url += $"&maxPrice={maxPrice}";
+                }
 
-                    url += $"&publisher={publisher}";
+              
 
 
                 var httpResponseMsg = await client.GetAsync(url);
@@ -48,7 +67,7 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
 
 
                 //Paging
-                var totalItem = await NumberOfItems(searchValue, publisher);
+                var totalItem = await NumberOfItems(searchBy, searchValue);
 
                 this.totalPages = totalItem / pageSize;
                 if (totalItem % pageSize != 0)
@@ -65,6 +84,8 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
             }
             return View(response);
         }
+
+
 
         private async Task<int> NumberOfItems(string searchValue, string publisher)
         {

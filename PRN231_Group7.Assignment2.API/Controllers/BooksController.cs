@@ -27,26 +27,29 @@ namespace PRN231_Group7.Assignment2.API.Controllers
         public static Expression<Func<Book, object>> GetOrderBy(string orderBy)
            => orderBy?.ToLower() switch
            {
-               "title" => x => x.Title,
-               "type" => x => x.Type,
-               _ => x => x.Title
+               "price" => x => x.Price,
+               _ => x => x.Price
            };
 
 
         [HttpGet]
         public IActionResult Get(
-            string? searchValue = null,
-            string? publisher = null,
-            string? orderBy = "",
+            string? searchByTitle = null,
+            string? searchByPublisher = null,
+            string? orderByPrice = null,
+            double? minPrice = null,
+            double? maxPrice = null,
             bool? orderByAsc = true,
             int? pageIndex = 1,
             int? pageSize = 10)
         {
             Expression<Func<Book, bool>> filter = p =>
-                (searchValue == null || p.Title.Contains(searchValue))
-                && (publisher == null || p.Publisher.PublisherName.Contains(publisher));
+                (searchByTitle == null || p.Title.Contains(searchByTitle))
+                && (searchByPublisher == null || p.Publisher.PublisherName.Contains(searchByPublisher))
+                && (minPrice == null || p.Price >= minPrice)
+                && (maxPrice == null || p.Price <= maxPrice);
 
-            var keySelector = GetOrderBy(orderBy);
+            var keySelector = GetOrderBy(orderByPrice);
 
             var result = unitOfWork.BookRepository.Get(
                 filter: filter,

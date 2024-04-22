@@ -70,3 +70,24 @@ table thead tr th {
     font-weight: 500;
     color: #000;
 }
+
+
+.select-with-icon {
+    position: relative;
+}
+
+.select-with-icon select {
+    padding-right: 30px; 
+}
+
+.select-with-icon svg {
+    position: absolute;
+    top: 50%;
+    right: 5px;
+    transform: translateY(-50%);
+}
+
+
+.label {
+    font-weight: 500;
+}
