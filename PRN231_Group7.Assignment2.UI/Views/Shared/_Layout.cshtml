@@ -10,24 +10,22 @@
 <body>
     <div class="container-fluid">
         <div class="row">
-            @* @if (TempData["UserRole"] != null && TempData["UserRole"].ToString() == "Admin")
-            { *@
+            @if (ViewBag.UserRole == "Admin")
+            {
                 <div class="col-md-3 p-0">
                     @await Html.PartialAsync("_Sidebar")
                 </div>
                 <div class="col-md-9 p-0">
                     @RenderBody()
                 </div>
-            @* } *@
-           @*  else
+            }
+            else
             {
                 @await Html.PartialAsync("_Header")
                 <div class="p-0">
                     @RenderBody()
                 </div>
-            } *@
-
-            
+            }
         </div>
     </div>
 
