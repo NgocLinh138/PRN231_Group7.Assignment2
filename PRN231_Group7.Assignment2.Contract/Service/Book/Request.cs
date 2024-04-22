@@ -50,7 +50,8 @@ namespace PRN231_Group7.Assignment2.Contract.Service.Book
             string? Notes,
 
             [Required(ErrorMessage = "{0} is required")]
-            DateTime PublishedDate
+            DateTime PublishedDate,
+             Guid PublisherId
         );
 
     }

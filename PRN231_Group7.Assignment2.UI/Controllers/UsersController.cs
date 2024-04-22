@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PRN231_Group7.Assignment2.UI.Models.Book;
 using PRN231_Group7.Assignment2.UI.Models.User;
 using System.Text;
 using System.Text.Json;
@@ -13,6 +14,9 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
     {
         private readonly IHttpClientFactory httpClientFactory;
         private readonly IHttpContextAccessor httpContextAccessor;
+        public int totalPages;
+        public int pageSize = 4;
+
         public UsersController(IHttpClientFactory httpClientFactory, IHttpContextAccessor httpContextAccessor)
         {
             this.httpClientFactory = httpClientFactory;
@@ -21,7 +25,9 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> Index(string? searchValue)
+        public async Task<IActionResult> Index(
+            string? searchValue,
+            int pageIndex = 1)
         {
             var roleName = httpContextAccessor.HttpContext.Session.GetString("UserRole");
             if (string.IsNullOrEmpty(roleName))
@@ -32,22 +38,49 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
             try
             {
                 var client = httpClientFactory.CreateClient();
-                var url = "http://localhost:5010/api/users";
+                var url = $"http://localhost:5010/api/users?orderByAsc=true&pageIndex={pageIndex}&pageSize={this.pageSize}";
 
                 if (!string.IsNullOrEmpty(searchValue))
                 {
-                    url += $"?searchValue={searchValue}";
+                    url += $"searchValue={searchValue}";
                 }
 
                 var httpResponseMsg = await client.GetAsync(url);
                 httpResponseMsg.EnsureSuccessStatusCode();
 
                 response.AddRange(await httpResponseMsg.Content.ReadFromJsonAsync<IEnumerable<UserModel>>());
+
+                //Paging
+                var totalItem = await NumberOfItems(searchValue);
+
+                this.totalPages = totalItem / pageSize;
+                if (totalItem % pageSize != 0)
+                {
+                    totalPages++;
+                }
+
+                ViewBag.TotalPages = this.totalPages;
+                ViewBag.PageIndex = pageIndex;
             }
             catch (Exception ex)
             {
             }
             return View(response);
+        }
+
+        private async Task<int> NumberOfItems(string searchValue)
+        {
+            List<BookModel> response = new List<BookModel>();
+            var client = httpClientFactory.CreateClient();
+            var url = $"http://localhost:5010/api/users?orderByAsc=true&pageIndex=1&pageSize=1000";
+            if (!string.IsNullOrEmpty(searchValue))
+
+                url += $"&searchValue={searchValue}";
+
+            var httpResponseMsg = await client.GetAsync(url);
+            httpResponseMsg.EnsureSuccessStatusCode();
+            response.AddRange(await httpResponseMsg.Content.ReadFromJsonAsync<IEnumerable<BookModel>>());
+            return response.Count();
         }
 
 

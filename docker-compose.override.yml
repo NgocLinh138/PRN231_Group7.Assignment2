@@ -1,0 +1,15 @@
+version: '3.4'
+
+services:
+  prn231_group7.assignment2.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "80"
+
+  prn231_group7.assignment2.ui:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "80"
+

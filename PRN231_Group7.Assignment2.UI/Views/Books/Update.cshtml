@@ -1,5 +1,10 @@
 ﻿@model PRN231_Group7.Assignment2.UI.Models.Book.UpdateBookRequestModel
 
+
+@{
+    var publishers = ViewBag.Publishers;
+}
+
 @if (Model is not null)
 {
     <div class="container mt-5">
@@ -69,8 +74,21 @@
                             <span asp-validation-for="PublishedDate" class="text-danger"></span>
                         </div>
                     </div>
-                   
-                   
+
+                    <div class="row mb-3">
+                        <label class="form-label col-sm-4">Publisher</label>
+                        <div class="col-sm-8">
+                            <select class="form-select" asp-for="PublisherId" id="publisherSelect">
+                                <option value="">Select Publisher</option>
+                                @foreach (var publisher in publishers)
+                                {
+                                    <option value="@publisher.Id">@publisher.PublisherName</option>
+                                }
+                            </select>
+                            <span asp-validation-for="PublisherId" class="text-danger"></span>
+                        </div>
+                    </div>
+
                     <div class="row mb-3">
                         <label class="form-label col-sm-4"></label>
                         <div class="row col-sm-8 m-0 justify-content-between">
