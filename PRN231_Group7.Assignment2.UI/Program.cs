@@ -6,6 +6,12 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddHttpClient();
 
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(15);
+    options.Cookie.IsEssential = true;
+    options.Cookie.HttpOnly = true;
+});
 
 var app = builder.Build();
 
@@ -17,6 +23,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseSession();
 
 app.UseStaticFiles();
 

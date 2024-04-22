@@ -123,9 +123,14 @@
         }
 
         function openDeleteModal(userId) {
-            var form = document.getElementById('deleteForm');
-            form.action = '@Url.Action("Delete", "Books")/' + userId;
-            $('#deleteModal').modal('show');
+            var userRole = '@ViewBag.UserRole';
+
+            if (userRole === 'Admin') {
+                var form = document.getElementById('deleteForm');
+                form.action = '@Url.Action("Delete", "Books")/' + userId;
+                $('#deleteModal').modal('show');
+            } else {
+            }
         }
     </script>
 </body>

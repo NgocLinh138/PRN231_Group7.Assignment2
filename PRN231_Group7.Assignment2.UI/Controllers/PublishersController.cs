@@ -10,23 +10,28 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
     public class PublishersController : Controller
     {
         private readonly IHttpClientFactory httpClientFactory;
-
-        public PublishersController(IHttpClientFactory httpClientFactory)
+        private readonly IHttpContextAccessor httpContextAccessor;
+        public PublishersController(IHttpClientFactory httpClientFactory, IHttpContextAccessor httpContextAccessor)
         {
             this.httpClientFactory = httpClientFactory;
+            this.httpContextAccessor = httpContextAccessor;
         }
 
 
         [HttpGet]
         public async Task<IActionResult> Index(string? searchValue)
         {
+            var roleName = httpContextAccessor.HttpContext.Session.GetString("UserRole");
+            if (string.IsNullOrEmpty(roleName))
+                return RedirectToAction("Index", "Books");
+
             List<PublisherModel> response = new List<PublisherModel>();
             try
             {
                 var client = httpClientFactory.CreateClient();
                 var url = "http://localhost:5010/api/publishers";
 
-                if(!string.IsNullOrEmpty(searchValue))
+                if (!string.IsNullOrEmpty(searchValue))
                 {
                     url += $"?searchValue={searchValue}";
                 }
@@ -34,7 +39,7 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
                 var httpResponseMessage = await client.GetAsync(url);
                 httpResponseMessage.EnsureSuccessStatusCode();
 
-                response.AddRange(await httpResponseMessage.Content.ReadFromJsonAsync<IEnumerable<PublisherModel>>()); 
+                response.AddRange(await httpResponseMessage.Content.ReadFromJsonAsync<IEnumerable<PublisherModel>>());
             }
             catch (Exception ex)
             {
@@ -43,7 +48,7 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
         }
 
 
-        [HttpGet] 
+        [HttpGet]
         public IActionResult Create()
         {
             return View();
@@ -52,9 +57,12 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreatePublisher request)
         {
+            var roleName = httpContextAccessor.HttpContext.Session.GetString("UserRole");
+            if (string.IsNullOrEmpty(roleName))
+                return RedirectToAction("Index", "Books");
             try
             {
-                if(!ModelState.IsValid)
+                if (!ModelState.IsValid)
                 {
                     return View(request);
                 }
@@ -71,14 +79,14 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
 
                 var httpResponseMessage = await client.SendAsync(httpRequestMessage);
 
-                if(httpResponseMessage.IsSuccessStatusCode)
+                if (httpResponseMessage.IsSuccessStatusCode)
                 {
                     return RedirectToAction("Index", "Publishers");
                 }
                 else
                 {
                     var responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
-                    return BadRequest("Error:" +  responseContent);
+                    return BadRequest("Error:" + responseContent);
                 }
             }
             catch (Exception ex)
@@ -92,11 +100,15 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
         [HttpGet]
         public async Task<IActionResult> Update(Guid id)
         {
+            var roleName = httpContextAccessor.HttpContext.Session.GetString("UserRole");
+            if (string.IsNullOrEmpty(roleName))
+                return RedirectToAction("Index", "Books");
+
             var client = httpClientFactory.CreateClient();
             var url = $"http://localhost:5010/api/publishers/{id}";
 
             var response = await client.GetFromJsonAsync<UpdatePublisher>(url);
-            if(response is not null) return View(response);
+            if (response is not null) return View(response);
 
             return View(null);
         }
@@ -107,7 +119,7 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
         {
             try
             {
-                if(!ModelState.IsValid)
+                if (!ModelState.IsValid)
                 {
                     return View(request);
                 }
@@ -133,7 +145,7 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest("Error: " +  ex.Message);
+                return BadRequest("Error: " + ex.Message);
             }
             return View();
         }
@@ -143,6 +155,10 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(PublisherModel request)
         {
+            var roleName = httpContextAccessor.HttpContext.Session.GetString("UserRole");
+            if (string.IsNullOrEmpty(roleName))
+                return RedirectToAction("Index", "Books");
+
             try
             {
                 var client = httpClientFactory.CreateClient();
@@ -163,4 +179,3 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
 
     }
 }
- 
