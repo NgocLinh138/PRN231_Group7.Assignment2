@@ -1,4 +1,11 @@
-﻿<!DOCTYPE html>
+﻿@inject IHttpContextAccessor _httpContextAccessor
+
+@{
+    string role = _httpContextAccessor.HttpContext.Request.Cookies["UserRole"];
+}
+
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -10,30 +17,28 @@
 <body>
     <div class="container-fluid">
         <div class="row">
-            @* @if (TempData["UserRole"] != null && TempData["UserRole"].ToString() == "Admin")
-            { *@
+            @if (!string.IsNullOrEmpty(role) && role == "Admin")
+            {
                 <div class="col-md-3 p-0">
                     @await Html.PartialAsync("_Sidebar")
                 </div>
                 <div class="col-md-9 p-0">
                     @RenderBody()
                 </div>
-            @* } *@
-           @*  else
+            } 
+            else
             {
                 @await Html.PartialAsync("_Header")
                 <div class="p-0">
                     @RenderBody()
                 </div>
-            } *@
-
-            
+            }
         </div>
     </div>
 
 
-@*     <partial name="_footer" />
- *@
+    @* <partial name="_footer" /> *@
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

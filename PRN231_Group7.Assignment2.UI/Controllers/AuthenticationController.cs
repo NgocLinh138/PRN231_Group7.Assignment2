@@ -60,7 +60,7 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
                     }
                     else
                     {
-                        return RedirectToAction("Index", "Home");
+                        return RedirectToAction("Homepage", "Books");
                     }
                 }
 
