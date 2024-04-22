@@ -11,16 +11,21 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
     public class AuthorsController : Controller
     {
         private readonly IHttpClientFactory httpClientFactory;
-
-        public AuthorsController(IHttpClientFactory httpClientFactory)
+        private readonly IHttpContextAccessor httpContextAccessor;
+        public AuthorsController(IHttpClientFactory httpClientFactory, IHttpContextAccessor httpContextAccessor)
         {
             this.httpClientFactory = httpClientFactory;
+            this.httpContextAccessor = httpContextAccessor;
         }
 
 
         [HttpGet]
         public async Task<IActionResult> Index(string? searchValue)
         {
+            var roleName = httpContextAccessor.HttpContext.Session.GetString("UserRole");
+            if (string.IsNullOrEmpty(roleName))
+                return RedirectToAction("Index", "Books");
+
             List<AuthorModel> response = new List<AuthorModel>();
             try
             {
@@ -46,9 +51,13 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
 
 
 
-        [HttpGet] 
+        [HttpGet]
         public IActionResult Create()
         {
+            var roleName = httpContextAccessor.HttpContext.Session.GetString("UserRole");
+            if (string.IsNullOrEmpty(roleName))
+                return RedirectToAction("Index", "Books");
+
             return View();
         }
 
@@ -96,6 +105,10 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
         [HttpGet]
         public async Task<IActionResult> Update(Guid id)
         {
+            var roleName = httpContextAccessor.HttpContext.Session.GetString("UserRole");
+            if (string.IsNullOrEmpty(roleName))
+                return RedirectToAction("Index", "Books");
+
             var client = httpClientFactory.CreateClient();
             var url = $"http://localhost:5010/api/authors/{id}";
 
@@ -147,6 +160,10 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(AuthorModel request)
         {
+            var roleName = httpContextAccessor.HttpContext.Session.GetString("UserRole");
+            if (string.IsNullOrEmpty(roleName))
+                return RedirectToAction("Index", "Books");
+
             try
             {
                 var client = httpClientFactory.CreateClient();

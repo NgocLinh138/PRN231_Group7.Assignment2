@@ -1,28 +1,32 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using UpdateUser = PRN231_Group7.Assignment2.UI.Models.User.UserRequestModel.UpdateUser;
-using CreateUser = PRN231_Group7.Assignment2.UI.Models.User.UserRequestModel.CreateUser;
+using PRN231_Group7.Assignment2.UI.Models.User;
 using System.Text;
 using System.Text.Json;
-using PRN231_Group7.Assignment2.UI.Models.User;
-using RoleResponse = PRN231_Group7.Assignment2.Contract.Service.Role.Response;
+using CreateUser = PRN231_Group7.Assignment2.UI.Models.User.UserRequestModel.CreateUser;
 using PublisherResponse = PRN231_Group7.Assignment2.Contract.Service.Publisher.Response;
-using PRN231_Group7.Assignment2.Repo.Model;
+using RoleResponse = PRN231_Group7.Assignment2.Contract.Service.Role.Response;
+using UpdateUser = PRN231_Group7.Assignment2.UI.Models.User.UserRequestModel.UpdateUser;
 
 namespace PRN231_Group7.Assignment2.UI.Controllers
 {
     public class UsersController : Controller
     {
         private readonly IHttpClientFactory httpClientFactory;
-
-        public UsersController(IHttpClientFactory httpClientFactory)
+        private readonly IHttpContextAccessor httpContextAccessor;
+        public UsersController(IHttpClientFactory httpClientFactory, IHttpContextAccessor httpContextAccessor)
         {
             this.httpClientFactory = httpClientFactory;
+            this.httpContextAccessor = httpContextAccessor;
         }
 
 
         [HttpGet]
         public async Task<IActionResult> Index(string? searchValue)
         {
+            var roleName = httpContextAccessor.HttpContext.Session.GetString("UserRole");
+            if (string.IsNullOrEmpty(roleName))
+                return RedirectToAction("Index", "Books");
+
             List<UserModel> response = new List<UserModel>();
 
             try
@@ -50,6 +54,10 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
+            var roleName = httpContextAccessor.HttpContext.Session.GetString("UserRole");
+            if (string.IsNullOrEmpty(roleName))
+                return RedirectToAction("Index", "Books");
+
             try
             {
                 var roles = await GetRoles();
@@ -111,6 +119,10 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
         [HttpGet]
         public async Task<IActionResult> Update(Guid id)
         {
+            var roleName = httpContextAccessor.HttpContext.Session.GetString("UserRole");
+            if (string.IsNullOrEmpty(roleName))
+                return RedirectToAction("Index", "Books");
+
             var client = httpClientFactory.CreateClient();
             var url = $"http://localhost:5010/api/users/{id}";
 
@@ -164,6 +176,10 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
 
         public async Task<IActionResult> Delete(UserModel user)
         {
+            var roleName = httpContextAccessor.HttpContext.Session.GetString("UserRole");
+            if (string.IsNullOrEmpty(roleName))
+                return RedirectToAction("Index", "Books");
+
             try
             {
                 var client = httpClientFactory.CreateClient();

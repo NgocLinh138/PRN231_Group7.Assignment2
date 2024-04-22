@@ -9,16 +9,20 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
     public class BooksController : Controller
     {
         private readonly IHttpClientFactory httpClientFactory;
-
-        public BooksController(IHttpClientFactory httpClientFactory)
+        private readonly IHttpContextAccessor httpContextAccessor;
+        public BooksController(IHttpClientFactory httpClientFactory, IHttpContextAccessor httpContextAccessor)
         {
             this.httpClientFactory = httpClientFactory;
+            this.httpContextAccessor = httpContextAccessor;
         }
 
 
         [HttpGet]
         public async Task<IActionResult> Index(string? searchValue)
         {
+            var roleName = httpContextAccessor.HttpContext.Session.GetString("UserRole");
+            ViewBag.UserRole = HttpContext.Session.GetString("UserRole");
+
             List<BookModel> response = new List<BookModel>();
             try
             {
@@ -47,16 +51,21 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
+            var roleName = httpContextAccessor.HttpContext.Session.GetString("UserRole");
+            if (string.IsNullOrEmpty(roleName))
+                return RedirectToAction("Index", "Books");
+
+
             try
             {
                 var publishers = await GetPublishers();
                 ViewBag.Publishers = publishers ?? new List<PublisherResponse>();
-                return View(new BookRequestModel()); 
+                return View(new BookRequestModel());
             }
             catch (Exception ex)
             {
                 ViewBag.Publishers = new List<PublisherResponse>();
-                return View(new BookRequestModel()); 
+                return View(new BookRequestModel());
             }
         }
 
@@ -107,6 +116,11 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
         [HttpGet]
         public async Task<IActionResult> Update(Guid id)
         {
+
+            var roleName = httpContextAccessor.HttpContext.Session.GetString("UserRole");
+            if (string.IsNullOrEmpty(roleName))
+                return RedirectToAction("Index", "Books");
+
             var client = httpClientFactory.CreateClient();
             var url = $"http://localhost:5010/api/books/{id}";
 
@@ -120,7 +134,7 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
         [HttpPost]
         public async Task<IActionResult> Update(UpdateBookRequestModel request)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return View(request);
             }
@@ -152,6 +166,11 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(BookModel book)
         {
+
+            var roleName = httpContextAccessor.HttpContext.Session.GetString("UserRole");
+            if (string.IsNullOrEmpty(roleName))
+                return RedirectToAction("Index", "Books");
+
             try
             {
                 var client = httpClientFactory.CreateClient();

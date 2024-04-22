@@ -18,42 +18,27 @@
 <body>
 
 
-    <div class="d-lg-flex half">
-        <div class="bg order-1 order-md-2" style="background-image: url('images/bg_1.jpg');"></div>
-        <div class="contents order-2 order-md-1">
+    <section class="text-center">
+        <div class="container">
+            <h1>Welcome to Bookstore</h1>
 
-            <div class="container">
-                <div class="row align-items-center justify-content-center">
-                    <div class="col-md-7">
-                        <h3>Login</h3>
-                        <p class="mb-4">Lorem ipsum dolor sit amet elit. Sapiente sit aut eos consectetur adipisicing.</p>
-                        <form action="#" method="post">
-                            <div class="form-group first">
-                                <label for="username">Username</label>
-                                <input type="text" class="form-control" placeholder="your-email@gmail.com" id="username">
-                            </div>
-                            <div class="form-group last mb-3">
-                                <label for="password">Password</label>
-                                <input type="password" class="form-control" placeholder="Your Password" id="password">
-                            </div>
-
-                            <div class="d-flex mb-5 align-items-center">
-                                <label class="control control--checkbox mb-0">
-                                    <span class="caption">Remember me</span>
-                                    <input type="checkbox" checked="checked" />
-                                    <div class="control__indicator"></div>
-                                </label>
-                                <span class="ml-auto"><a href="#" class="forgot-pass">Forgot Password</a></span>
-                            </div>
-
-                            <input type="submit" value="Log In" class="btn btn-block btn-primary">
-
-                        </form>
+            <form method="get" action="@Url.Action("Index", "Books")" class="my-5 book-search-form">
+                <label for="searchValue">Search by title:</label>
+                <div class="row mt-2">
+                    <div class="form-group col-md-6">
+                        <input type="text" class="form-control" id="searchValue" name="searchValue" placeholder="Enter title..." value="@ViewBag.SearchValue">
+                    </div>
+                    <div class="form-group col-md-6 p-0">
+                        <input type="submit" class="btn btn-secondary" value="Search" />
                     </div>
                 </div>
-            </div>
+            </form>
+
+
+
         </div>
-    </div>
+    </section>
+
 
 
 

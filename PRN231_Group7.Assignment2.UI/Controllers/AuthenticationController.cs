@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using PRN231_Group7.Assignment2.UI.Models.Authentication;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -12,13 +13,15 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
     {
         private readonly IHttpClientFactory httpClientFactory;
         private readonly IHttpContextAccessor httpContextAccessor;
-
+        private readonly IConfiguration configuration;
         public AuthenticationController(
             IHttpClientFactory httpClientFactory,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            IConfiguration configuration)
         {
             this.httpClientFactory = httpClientFactory;
             this.httpContextAccessor = httpContextAccessor;
+            this.configuration = configuration;
         }
 
         [HttpGet]
@@ -51,17 +54,17 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
                     var token = JsonSerializer.Deserialize<string>(response);
                     httpContextAccessor.HttpContext.Response.Cookies.Append("JwtToken", token);
 
-                    var userRole = GetRoleFromToken(token);
-                    httpContextAccessor.HttpContext.Session.SetString("UserRole", userRole);
 
-                    if (userRole == "Admin")
+
+                    var principal = GetPrincipalFromExpiredToken(token);
+                    var isAdmin = principal.IsInRole("Admin");
+                    if (isAdmin)
                     {
-                        return RedirectToAction("Index", "Books");
+                        httpContextAccessor.HttpContext.Session.SetString("UserRole", "Admin");
                     }
-                    else
-                    {
-                        return RedirectToAction("Index", "Home");
-                    }
+
+                    return RedirectToAction("Index", "Books");
+
                 }
 
                 TempData["ErrorMessage"] = "Invalid email or password.";
@@ -75,7 +78,31 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
             }
         }
 
+        private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+        {
+            var key = Encoding.UTF8.GetBytes("792e15012ec45cf57f8158d0b5561a1b78b5386c1327ebe6706cb92c66810d6a");
 
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidAudience = "prn231-client",
+                ValidIssuer = "prn231-auth-api",
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ClockSkew = TimeSpan.Zero
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
+
+            var jwtSecurityToken = (JwtSecurityToken)securityToken;
+            if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCulture))
+                throw new SecurityTokenException("Invalid Token");
+
+            return principal;
+        }
         private string GetRoleFromToken(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
