@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Docker Compose": {
+      "commandName": "DockerCompose",
+      "commandVersion": "1.0",
+      "serviceActions": {
+        "prn231_group7.assignment2.api": "StartDebugging",
+        "prn231_group7.assignment2.ui": "StartDebugging"
+      }
+    }
+  }
+}

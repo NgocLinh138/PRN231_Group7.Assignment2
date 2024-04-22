@@ -10,15 +10,19 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
     {
         private readonly IHttpClientFactory httpClientFactory;
         private readonly IHttpContextAccessor httpContextAccessor;
+        public int totalPages;
+        public int pageSize = 4;
         public BooksController(IHttpClientFactory httpClientFactory, IHttpContextAccessor httpContextAccessor)
         {
             this.httpClientFactory = httpClientFactory;
             this.httpContextAccessor = httpContextAccessor;
         }
 
-
         [HttpGet]
-        public async Task<IActionResult> Index(string? searchValue)
+        public async Task<IActionResult> Index(
+            string? searchValue,
+            string? publisher,
+            int pageIndex = 1)
         {
             var roleName = httpContextAccessor.HttpContext.Session.GetString("UserRole");
             ViewBag.UserRole = HttpContext.Session.GetString("UserRole");
@@ -27,17 +31,34 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
             try
             {
                 var client = httpClientFactory.CreateClient();
-                var url = "http://localhost:5010/api/books";
+                var url = $"http://localhost:5010/api/books?orderByAsc=true&pageIndex={pageIndex}&pageSize={this.pageSize}";
 
                 if (!string.IsNullOrEmpty(searchValue))
-                {
-                    url += $"?searchValue={searchValue}";
-                }
+
+                    url += $"&searchValue={searchValue}";
+
+                if (!string.IsNullOrEmpty(publisher))
+
+                    url += $"&publisher={publisher}";
+
 
                 var httpResponseMsg = await client.GetAsync(url);
                 httpResponseMsg.EnsureSuccessStatusCode();
-
                 response.AddRange(await httpResponseMsg.Content.ReadFromJsonAsync<IEnumerable<BookModel>>());
+
+
+                //Paging
+                var totalItem = await NumberOfItems(searchValue, publisher);
+
+                this.totalPages = totalItem / pageSize;
+                if (totalItem % pageSize != 0)
+                {
+                    totalPages++;
+                }
+
+                ViewBag.TotalPages = this.totalPages;
+                ViewBag.PageIndex = pageIndex;
+
             }
             catch (Exception ex)
             {
@@ -45,8 +66,23 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
             return View(response);
         }
 
+        private async Task<int> NumberOfItems(string searchValue, string publisher)
+        {
+            List<BookModel> response = new List<BookModel>();
+            var client = httpClientFactory.CreateClient();
+            var url = $"http://localhost:5010/api/books?orderByAsc=true&pageIndex=1&pageSize=1000";
+            if (!string.IsNullOrEmpty(searchValue))
 
+                url += $"&searchValue={searchValue}";
 
+            if (!string.IsNullOrEmpty(publisher))
+
+                url += $"&publisher={publisher}";
+            var httpResponseMsg = await client.GetAsync(url);
+            httpResponseMsg.EnsureSuccessStatusCode();
+            response.AddRange(await httpResponseMsg.Content.ReadFromJsonAsync<IEnumerable<BookModel>>());
+            return response.Count();
+        }
 
         [HttpGet]
         public async Task<IActionResult> Create()
@@ -116,6 +152,8 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
         [HttpGet]
         public async Task<IActionResult> Update(Guid id)
         {
+            var publishers = await GetPublishers();
+            ViewBag.Publishers = publishers ?? new List<PublisherResponse>();
 
             var roleName = httpContextAccessor.HttpContext.Session.GetString("UserRole");
             if (string.IsNullOrEmpty(roleName))
@@ -136,6 +174,8 @@ namespace PRN231_Group7.Assignment2.UI.Controllers
         {
             if (!ModelState.IsValid)
             {
+                var publishers = await GetPublishers();
+                ViewBag.Publishers = publishers ?? new List<PublisherResponse>();
                 return View(request);
             }
 

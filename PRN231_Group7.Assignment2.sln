@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PRN231_Group7.Assignment2.A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PRN231_Group7.Assignment2.Contract", "PRN231_Group7.Assignment2.Contract\PRN231_Group7.Assignment2.Contract.csproj", "{68A7EA0F-39D7-4027-B4DC-9BE9E4F0F948}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRN231_Group7.Assignment2.UI", "PRN231_Group7.Assignment2.UI\PRN231_Group7.Assignment2.UI.csproj", "{9EF2691B-6CD4-4F99-B9F6-117167AE8572}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PRN231_Group7.Assignment2.UI", "PRN231_Group7.Assignment2.UI\PRN231_Group7.Assignment2.UI.csproj", "{9EF2691B-6CD4-4F99-B9F6-117167AE8572}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{229C372E-3F77-4F57-B91B-F4161F32A1D7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{9EF2691B-6CD4-4F99-B9F6-117167AE8572}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9EF2691B-6CD4-4F99-B9F6-117167AE8572}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9EF2691B-6CD4-4F99-B9F6-117167AE8572}.Release|Any CPU.Build.0 = Release|Any CPU
+		{229C372E-3F77-4F57-B91B-F4161F32A1D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{229C372E-3F77-4F57-B91B-F4161F32A1D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{229C372E-3F77-4F57-B91B-F4161F32A1D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{229C372E-3F77-4F57-B91B-F4161F32A1D7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -27,7 +27,7 @@ namespace PRN231_Group7.Assignment2.UI.Models.Book
         [Required(ErrorMessage = "{0} is required")]
         public DateTime PublishedDate { get; set; }
 
+        public Guid PublisherId { get; set; }
 
-       
     }
 }

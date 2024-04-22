@@ -36,13 +36,15 @@ namespace PRN231_Group7.Assignment2.API.Controllers
         [HttpGet]
         public IActionResult Get(
             string? searchValue = null,
+            string? publisher = null,
             string? orderBy = "",
             bool? orderByAsc = true,
             int? pageIndex = 1,
             int? pageSize = 10)
         {
             Expression<Func<Book, bool>> filter = p =>
-                (searchValue == null || p.Title.Contains(searchValue));
+                (searchValue == null || p.Title.Contains(searchValue))
+                && (publisher == null || p.Publisher.PublisherName.Contains(publisher));
 
             var keySelector = GetOrderBy(orderBy);
 
@@ -87,6 +89,10 @@ namespace PRN231_Group7.Assignment2.API.Controllers
                 Price = request.Price,
                 PublishedDate = DateTime.Now,
                 PublisherId = request.PublisherId,
+                Advance = request.Advance,
+                Notes = request.Notes,
+                Royalty = request.Royalty,
+                YtdSales = request.YtdSales,
             };
 
             //if (request.BookImage.Length > 0)
@@ -128,7 +134,12 @@ namespace PRN231_Group7.Assignment2.API.Controllers
             existingBook.Type = request.Type;
             existingBook.Price = request.Price;
             existingBook.PublishedDate = request.PublishedDate;
-            //existingBook.PublisherId = request.PublisherId;
+            existingBook.PublisherId = request.PublisherId;
+            existingBook.Advance = request.Advance;
+            existingBook.Notes = request.Notes;
+            existingBook.Royalty = request.Royalty;
+            existingBook.YtdSales = request.YtdSales;
+
 
             unitOfWork.BookRepository.Update(existingBook);
             unitOfWork.Save();

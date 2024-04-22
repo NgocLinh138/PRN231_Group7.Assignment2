@@ -1,0 +1,42 @@
+version: '3.4'
+
+services:
+  prn231_group7.assignment2.api:
+    image: ${DOCKER_REGISTRY-}prn231group7assignment2api
+    build:
+      context: .
+      dockerfile: PRN231_Group7.Assignment2.API/Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - sqlserver
+    networks:
+      - my-network
+
+  prn231_group7.assignment2.ui:
+    image: ${DOCKER_REGISTRY-}prn231group7assignment2ui
+    build:
+      context: .
+      dockerfile: PRN231_Group7.Assignment2.UI/Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prn231_group7.assignment2.api
+    networks:
+      - my-network
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: sqlserver
+    ports:
+      - "8002:1433"
+    environment:
+      SA_PASSWORD: "buihuydAt1420@"
+      ACCEPT_EULA: "Y"
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge
+

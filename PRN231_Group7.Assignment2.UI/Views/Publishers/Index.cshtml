@@ -1,5 +1,9 @@
 ﻿@model IEnumerable<PRN231_Group7.Assignment2.UI.Models.Publisher.PublisherModel>
 
+@{
+    int totalPages = ViewBag.TotalPages;
+    int pageIndex = ViewBag.PageIndex;
+}
 
 <!DOCTYPE html>
 <html>
@@ -57,6 +61,39 @@
                         </td>
                     </tr>
                 }
+
+                <tr>
+                    <td colspan="8">
+                        <div class="pagination-horizontal">
+                            @if (totalPages > 1)
+                            {
+                                @for (int i = 1; i <= totalPages; i++)
+                                {
+                                    if (i == pageIndex)
+                                    {
+                                        <span>@i</span>
+                                    }
+                                    else
+                                    {
+                                        <a class="pagination-link" asp-controller="Publishers" asp-action="Index" asp-route-pageIndex="@i">@i</a>
+                                    }
+
+                                    if (i < totalPages)
+                                    {
+                                        <span>|</span>
+                                    }
+                                }
+                            }
+
+                            @if (totalPages > 5)
+                            {
+                                <span>...</span>
+                                <a class="pagination-link" asp-controller="Publishers" asp-action="Index" asp-route-pageIndex="@(totalPages - 1)">@totalPages - 1</a>
+                                <a class="pagination-link" asp-controller="Publishers" asp-action="Index" asp-route-pageIndex="@totalPages">@totalPages</a>
+                            }
+                        </div>
+                    </td>
+                </tr>
             </tbody>
         </table>
 
